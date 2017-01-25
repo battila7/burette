@@ -4,6 +4,7 @@
   "description": "Chemical programming framework based on Banatre's gamma-calculus.",
   "main": "lib/index.js",
   "scripts": {
+    "lib": "./node_modules/.bin/tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/battila7/burette/issues"
   },
-  "homepage": "https://github.com/battila7/burette#readme"
+  "homepage": "https://github.com/battila7/burette#readme",
+  "devDependencies": {
+    "typescript": "^2.1.5"
+  }
 }

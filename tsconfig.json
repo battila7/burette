@@ -1,6 +1,6 @@
 {
     "files": [
-        "src/index.js"
+        "src/index.ts"
     ],
     "compilerOptions": {
         "removeComments": false,
