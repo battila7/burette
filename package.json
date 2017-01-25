@@ -1,0 +1,23 @@
+{
+  "name": "burette",
+  "version": "0.1.0",
+  "description": "Chemical programming framework based on Banatre's gamma-calculus.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/battila7/burette.git"
+  },
+  "keywords": [
+    "chemical",
+    "framework"
+  ],
+  "author": "Attila Bagossy",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/battila7/burette/issues"
+  },
+  "homepage": "https://github.com/battila7/burette#readme"
+}
