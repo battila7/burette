@@ -1,5 +1,7 @@
 import eslint from 'rollup-plugin-eslint';
 import uglify from 'rollup-plugin-uglify';
+import babel from 'rollup-plugin-babel';
+
 
 export default {
   entry: 'src/index.js',
@@ -8,6 +10,9 @@ export default {
   sourceMap: 'inline',
   plugins: [
     eslint(),
+     babel({
+      exclude: 'node_modules/**'
+    }),
     uglify()
   ],
 };
