@@ -1,3 +1,35 @@
+export const Reagent =  {
+  t() {
+    return true;
+  },
+  of(condition, action) {
+    if (!action) {
+      action = condition;
+    }
+
+    const obj = Object.create(Reagent);
+
+    obj.condition = Reagent.t;
+
+    obj.action = action;
+
+    obj.args = obj.condition.length;
+
+    return obj; 
+  },
+  nShot(reagent) {
+    if (!Object.prototype.isPrototypeOf.call(Reagent, reagent)) {
+      throw new TypeError('The provided argument is not a reagent!');
+    }
+
+    const action = function action(...args) {
+      return [reagent.action(...args), reagent];
+    };
+
+    return Reagent.of(reagent.condition, action);
+  }
+};
+
 export const Solution = {
   of(elements) {
     const obj = Object.create(Solution);
