@@ -1,52 +1,23 @@
-function permute(permutation) {
-  var length = permutation.length,
-    result = new Array([0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600][length]),
-    c = new Array(length).fill(0),
-    i = 1,
-    j = 1;
-
-  result[0] = permutation.slice();
-  
-  while (i < length) {
-    if (c[i] < i) {
-      var k = (i % 2) ? c[i] : 0,
-        p = permutation[i];
-
-      permutation[i] = permutation[k];
-      permutation[k] = p;
-
-      ++c[i];
-
-      i = 1;
-
-      result[j] = permutation.slice();
-
-      ++j;
-    } else {
-      c[i] = 0;
-      ++i;
-    }
-  }
-
-  return result;
-}
+import Combinatorics from 'js-combinatorics';
 
 export const Reagent =  {
   t() {
     return true;
   },
   of(condition, action) {
-    if (!action) {
-      action = condition;
-    }
-
     const obj = Object.create(Reagent);
 
-    obj.condition = Reagent.t;
+    if (!action) {
+      action = condition;
+
+      obj.condition = Reagent.t;
+    } else {
+      obj.condition = condition;
+    }
 
     obj.action = action;
 
-    obj.args = obj.condition.length;
+    obj.args = Math.max(obj.condition.length, obj.action.length);
 
     return obj; 
   },
@@ -55,11 +26,15 @@ export const Reagent =  {
       throw new TypeError('The provided argument is not a reagent!');
     }
 
-    const action = function action(...args) {
-      return [reagent.action(...args), reagent];
-    };
+    function action(...args) {
+      return [reagent.action(...args), result];
+    }
 
-    return Reagent.of(reagent.condition, action);
+    var result = Reagent.of(reagent.condition, action);
+
+    result.args = reagent.args;
+
+    return result;
   }
 };
 
@@ -79,9 +54,10 @@ export const Solution = {
       .map(r => this.executeReaction(r));
 
     const promises = solutionPromises.concat(reagentPromises)
-      .map(p => p.then(result => this.incorporateResult(result)));
+      .map(p => p.then(result => this.incorporateResult(result))
+                 .then(() => this.react()));
 
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => this);
   },
   incorporateResult(result) {
     if (Array.isArray(result)) {
@@ -123,6 +99,8 @@ export const Solution = {
           this.multiset.push(reagent);
         } else {
           reactions.push({ reagent, args });
+
+          i = this.multiset.length;
         }
       }
     }
@@ -134,12 +112,14 @@ export const Solution = {
       return [];
     }
 
-    for (let i = 0; i < this.multiset.length - reagent.args; i++) {
-      const args = permute(this.multiset.slice(i, i + reagent.args + 1))
-          .find(a => reagent.condition(...a));
+    const perm = Combinatorics.permutation(this.multiset, reagent.args);
 
-      if (args) {
-        this.multiset.splice(i, reagent.args);
+    let args;
+
+    // eslint-disable-next-line no-cond-assign
+    while (args = perm.next()) {
+      if (reagent.condition(...args)) {
+        args.forEach(a => this.multiset.splice(this.multiset.indexOf(a), 1));
 
         return args;
       }

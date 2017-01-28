@@ -1,7 +1,8 @@
 import eslint from 'rollup-plugin-eslint';
 import uglify from 'rollup-plugin-uglify';
 import babel from 'rollup-plugin-babel';
-
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
 export default {
   entry: 'src/index.js',
@@ -10,7 +11,12 @@ export default {
   sourceMap: 'inline',
   plugins: [
     eslint(),
-     babel({
+    resolve({
+      jsnext: true,
+      main: true
+    }),
+    commonjs(),
+    babel({
       exclude: 'node_modules/**'
     }),
     uglify()
