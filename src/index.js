@@ -70,10 +70,16 @@ const Reagent =  {
 };
 
 const Solution = {
-  of(elements) {
+  of(elements, options) {
+    const defaults = {
+      mergeReagents: true
+    };
+
     const obj = Object.create(Solution);
 
     obj.multiset = elements.concat();
+
+    obj.options = Object.assign({}, defaults, options);
 
     return obj;
   },
@@ -92,22 +98,29 @@ const Solution = {
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
-      .map(s => s.react());
+      .map(s => s.react()
+                 .then(solution => this.mergeSolution(solution)));
 
     const reagentPromises = this.removeAndGetReactions()
-      .map(r => this.executeReaction(r));
+      .map(r => this.executeReaction(r)
+                    .then(result => this.incorporateResult(result)));
 
     const promises = solutionPromises.concat(reagentPromises)
-      .map(p => p.then(result => this.incorporateResult(result))
-                 .then(() => this.react()));
+      .map(p => p.then(() => this.react()));
 
     return Promise.all(promises).then(() => this);
   },
-  incorporateResult(result) {
-    if (Object.prototype.isPrototypeOf.call(Solution, result)) {
-      result = result.multiset;
-    }
+  mergeSolution(solution) {
+    if (!this.options.mergeReagents) {
+      const arr =
+        solution.multiset.filter(e => !Object.prototype.isPrototypeOf.call(Reagent, e));
 
+      this.multiset.push(...arr);
+    } else {
+      this.multiset.push(...solution.multiset);
+    }
+  },
+  incorporateResult(result) {
     if (Array.isArray(result)) {
       this.multiset.push(...result);
     } else if (result !== undefined) {
