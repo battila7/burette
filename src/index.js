@@ -48,7 +48,7 @@ const Reagent =  {
     }
 
     function action(...args) {
-      return [reagent.action(...args), result];
+      return [...reagent.action(...args), result];
     }
 
     var result = Reagent.of({ 
@@ -82,13 +82,7 @@ const Solution = {
       return Solution.of([a]);
     });
 
-    if (this != Solution) {
-      this.multiset.push(...solutions);
-
-      return this;
-    } else {
-      return Solution.of(solutions);
-    }
+    return Solution.of(solutions);
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
