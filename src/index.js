@@ -42,9 +42,28 @@ export const Solution = {
   of(elements) {
     const obj = Object.create(Solution);
 
-    obj.multiset = elements;
+    obj.multiset = elements.concat();
 
     return obj;
+  },
+  parallel(...args) {
+    const solutions = args.map(function toSolution(a) {
+      if (Object.prototype.isPrototypeOf.call(Solution, a)) {
+        return a;
+      } else if (Array.isArray(a)) {
+        return Solution.of(a);
+      }
+
+      return Solution.of([a]);
+    });
+
+    if (this !== Solution) {
+      this.multiset.push(solutions);
+
+      return this;
+    } else {
+      return Solution.of(solutions);
+    }
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
@@ -60,6 +79,10 @@ export const Solution = {
     return Promise.all(promises).then(() => this);
   },
   incorporateResult(result) {
+    if (Object.prototype.isPrototypeOf.call(Solution, result)) {
+      result = result.multiset;
+    }
+
     if (Array.isArray(result)) {
       this.multiset.push(...result);
     } else if (result !== undefined) {
@@ -110,6 +133,10 @@ export const Solution = {
   findMatchingArguments(reagent) {
     if (reagent.args == 0) {
       return [];
+    }
+
+    if (reagent.args > this.multiset.length) {
+      return null;
     }
 
     const perm = Combinatorics.permutation(this.multiset, reagent.args);
