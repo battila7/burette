@@ -11,7 +11,8 @@ const Reagent =  {
   of(options) {
     const defaults = {
       condition: Reagent.t,
-      shape: []
+      shape: [],
+      acceptReagent: false
     }; 
 
     options = Object.assign({}, defaults, options);
@@ -196,7 +197,10 @@ const Solution = {
     const length = Math.min(reagent.shape.length, args.length);
 
     for (let i = 0; i < length; i++) {
-      if (!shapeValidatorFunc(args[i], reagent.shape[i])) {
+      const noReagentMatch = !reagent.acceptReagent
+                           && Object.prototype.isPrototypeOf.call(Reagent, args[i]);
+
+      if (noReagentMatch || !shapeValidatorFunc(args[i], reagent.shape[i])) {
         return false;
       }
     }
