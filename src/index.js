@@ -57,8 +57,8 @@ export const Solution = {
       return Solution.of([a]);
     });
 
-    if (this !== Solution) {
-      this.multiset.push(solutions);
+    if (this != Solution) {
+      this.multiset.push(...solutions);
 
       return this;
     } else {
