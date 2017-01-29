@@ -48,18 +48,24 @@ const Reagent =  {
     }
 
     function action(...args) {
-      return [reagent.action(...args), result];
+      const result = reagent.action(...args);
+
+      if (Array.isArray(result)) {
+        return [...result, nShotReagent];
+      }
+
+      return [result, nShotReagent];
     }
 
-    var result = Reagent.of({ 
+    var nShotReagent = Reagent.of({ 
       condition: reagent.condition,
       shape: reagent.shape, 
       action 
     });
 
-    result.args = reagent.args;
+    nShotReagent.args = reagent.args;
 
-    return result;
+    return nShotReagent;
   }
 };
 
@@ -82,13 +88,7 @@ const Solution = {
       return Solution.of([a]);
     });
 
-    if (this != Solution) {
-      this.multiset.push(...solutions);
-
-      return this;
-    } else {
-      return Solution.of(solutions);
-    }
+    return Solution.of(solutions);
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
