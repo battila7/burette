@@ -22,6 +22,10 @@ export const Reagent =  {
     return obj; 
   },
   nShot(reagent) {
+    if (this != Reagent) {
+      reagent = this;
+    }
+
     if (!Object.prototype.isPrototypeOf.call(Reagent, reagent)) {
       throw new TypeError('The provided argument is not a reagent!');
     }
