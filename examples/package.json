@@ -1,0 +1,14 @@
+{
+  "name": "examples",
+  "version": "0.0.0",
+  "description": "Examples for Burette.",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Attila Bagossy",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "joi": "^10.2.0"
+  }
+}
