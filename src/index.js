@@ -1,21 +1,38 @@
 import Combinatorics from 'js-combinatorics';
 
-export const Reagent =  {
+let shapeValidatorFunc = function validate() {
+  return true;
+};
+
+const Reagent =  {
   t() {
     return true;
   },
-  of(condition, action) {
-    const obj = Object.create(Reagent);
+  of(options) {
+    const defaults = {
+      condition: Reagent.t,
+      shape: []
+    }; 
 
-    if (!action) {
-      action = condition;
+    options = Object.assign({}, defaults, options);
 
-      obj.condition = Reagent.t;
-    } else {
-      obj.condition = condition;
+    if (typeof options.action != 'function') {
+      throw new TypeError('The action must not be omitted and must be a function!');
     }
 
-    obj.action = action;
+    if (typeof options.condition != 'function') {
+      throw new TypeError('The condition must not be omitted and must be a function!');
+    }
+
+    if (!Array.isArray(options.shape)) {
+      throw new TypeError('The shape must be an array!');
+    }
+
+    const obj = Object.create(Reagent);
+
+    obj.condition = options.condition,
+    obj.shape = options.shape;
+    obj.action = options.action;
 
     obj.args = Math.max(obj.condition.length, obj.action.length);
 
@@ -34,7 +51,11 @@ export const Reagent =  {
       return [reagent.action(...args), result];
     }
 
-    var result = Reagent.of(reagent.condition, action);
+    var result = Reagent.of({ 
+      condition: reagent.condition,
+      shape: reagent.shape, 
+      action 
+    });
 
     result.args = reagent.args;
 
@@ -42,7 +63,7 @@ export const Reagent =  {
   }
 };
 
-export const Solution = {
+const Solution = {
   of(elements) {
     const obj = Object.create(Solution);
 
@@ -149,7 +170,7 @@ export const Solution = {
 
     // eslint-disable-next-line no-cond-assign
     while (args = perm.next()) {
-      if (reagent.condition(...args)) {
+      if (this.validateShape(reagent, args) && reagent.condition(...args)) {
         args.forEach(a => this.multiset.splice(this.multiset.indexOf(a), 1));
 
         return args;
@@ -157,5 +178,31 @@ export const Solution = {
     }
 
     return null;
+  },
+  validateShape(reagent, args) {
+    const length = Math.min(reagent.shape.length, args.length);
+
+    for (let i = 0; i < length; i++) {
+      if (!shapeValidatorFunc(args[i], reagent.shape[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+};
+
+export default {
+  Solution,
+  Reagent,
+  get shapeValidator() {
+    return shapeValidatorFunc;
+  },
+  set shapeValidator(func) {
+    if (typeof func != 'function') {
+      throw new TypeError('The argument is not a function!');
+    }
+
+    shapeValidatorFunc = func;
   }
 };
