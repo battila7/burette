@@ -45,6 +45,8 @@ Factory method that returns a new `Reagent` with the configuration described by 
   * `action` `function` a function that will be executed if the `condition` and the `shape` constraints are met
   * `acceptReagent` `boolean` `optional` whether the `Reagent` should accept other `Reagent`s as arguments. This constraint can be expressed using the `shape` but by using this property, sometimes the `shape` can be omitted. By default it's `false`.
 
+**Note** that if the return value of the `action` is an array, then its elements will be merged into the containing `Solution`. Therefore if you do want to have array elements in your `Solution`, then wrap the return value into a one-element array.
+
 ### Reagent.nShot(reagent) | nShot()
 
 `nShot` can be used as a static method or an instance method. 
