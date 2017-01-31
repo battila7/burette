@@ -4,6 +4,8 @@
 
 Represents a *solution* that can encapsulate various elements such as ordinary numbers, objects, strings, `Reagent`s and other `Solution`s. A program in Burette is basically just a `Solution`.
 
+Currently the underlying elements of a solution can be accessed using the `multiset` key of a `Solution` object. The multiset is actually represented as an ordinary array. **Note** that the way of reading the contents of a `Solution` will be changed in subsequent versions to a more safe approach as well as the underlying container.
+
 ### Solution.of(elements, [options])
 
 Factory method that returns a `Solution` object encapsulating the passed elements. The `elements` parameter must be an array of arbitrary elements.
