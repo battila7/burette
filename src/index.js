@@ -115,10 +115,22 @@ const Tropes = {
   Selector: returnGenericTropes
 };
 
+const argsIntoSolutions = function argsIntoSolutions(...args) {
+  return args.map(function toSolution(a) {
+    if (Object.prototype.isPrototypeOf.call(Solution, a)) {
+      return a;
+    } else if (Array.isArray(a)) {
+      return Solution.of(a);
+    }
+
+    return Solution.of([a]);
+  });
+};
+
 const Solution = {
   of(elements, options) {
     const defaults = {
-      mergeReagents: true
+      mergeReagents: false
     };
 
     const obj = Object.create(Solution);
@@ -129,18 +141,17 @@ const Solution = {
 
     return obj;
   },
+  seq(...args) {
+    const solutions = argsIntoSolutions(...args);
+
+    for (let i = 0; i < solutions.length - 1; i++) {
+      solutions[i + 1].multiset.push(solutions[i]);
+    }
+
+    return solutions[solutions.length - 1];
+  },
   parallel(...args) {
-    const solutions = args.map(function toSolution(a) {
-      if (Object.prototype.isPrototypeOf.call(Solution, a)) {
-        return a;
-      } else if (Array.isArray(a)) {
-        return Solution.of(a);
-      }
-
-      return Solution.of([a]);
-    });
-
-    return Solution.of(solutions);
+    return Solution.of(argsIntoSolutions(...args));
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
