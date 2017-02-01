@@ -70,6 +70,51 @@ const Reagent =  {
   }
 };
 
+const returnGenericTropes = function returnGenericTropes(options) {
+  if (typeof options == 'function') {
+    return Reagent.of({
+      action: options
+    }).nShot();
+  }
+
+  return Reagent.of(options).nShot();
+};
+
+const Tropes = {
+  Transmuter: returnGenericTropes,
+  Reducer: returnGenericTropes,
+  Optimiser(options) {
+    const action = function action(x, y) {
+      return [options.left(x, y), options.right(x, y)];
+    };
+
+    const condition = function condition(x, y) {
+      const left = options.left(x, y);
+      const right = options.right(x, y);
+
+      return options.ordering({ x: left, y: right }, { x, y }) && options.selector(x, y) && options.selector(left, right);
+    };
+
+    return Reagent.of({
+      condition,
+      shape: options.shape || [],
+      action
+    }).nShot();
+  },
+  Expander(options) {
+    const action = function action(x) {
+      return [options.left(x), options.right(x)];
+    };
+
+    return Reagent.of({
+      condition: options.condition,
+      shape: options.shape || [],
+      action
+    }).nShot();
+  },
+  Selector: returnGenericTropes
+};
+
 const Solution = {
   of(elements, options) {
     const defaults = {
@@ -212,6 +257,7 @@ const Solution = {
 export default {
   Solution,
   Reagent,
+  Tropes,
   get shapeValidator() {
     return shapeValidatorFunc;
   },
