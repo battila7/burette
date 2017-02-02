@@ -92,7 +92,7 @@ const Tropes = {
       const left = options.left(x, y);
       const right = options.right(x, y);
 
-      return options.ordering({ x: left, y: right }, { x, y }) && options.selector(x, y) && options.selector(left, right);
+      return options.ordering({ x: left, y: right }, { x, y }) && options.relation(x, y) && options.relation(left, right);
     };
 
     return Reagent.of({
