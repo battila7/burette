@@ -156,6 +156,10 @@ The `options` parameter can be a `function`. In that case the passed `function` 
   * operate on one element
   * return one element
 
+**Must**
+
+  * not change the number of elements in the `Solution`
+
 ### Tropes.Reducer(options): Reagent
 
 Reduces the size of the `Solution` by applying an operation to pairs of elements and returning only one element.
@@ -173,6 +177,10 @@ The `options` parameter can be a `function`. In that case the passed `function` 
   * operate on two elements
   * return one element
 
+**Must**
+
+  * reduce the number of elements in the `Solution`
+
 ### Tropes.Optimiser(options): Reagent
 
 Optimises the `Solution` according to a particular criterion while preserving the structure of the `Solution`.
@@ -182,7 +190,7 @@ Valid keys of the `options` parameter:
   * `ordering` `function` expresses the criterion. Called as
 
   ~~~~JavaScript
-  ordering({ x: left(x, y), y: right(x, y) }, { x, y })
+  ordering(left(x, y), right(x, y), x, y)
   ~~~~
 
   * `left` `function` calculates the first return value of the optimizer, takes two parameters
@@ -206,4 +214,12 @@ Acts as a filter (annihilator), removing from the `Solution` elements satisfying
 
 The keys of the `options` parameter are the same as in the case of `Reagent.of(options)`. This method just increases the readibility.
 
-The `options` parameter can be a `function`. In that case the passed `function` is going to be the *condition* of the Selector. The *shape* is going to be an empty array, while the action is `() => []`.
+The `options` parameter can even be a `function` or an Array. In the first case case the passed `function` is going to be the *condition* of the Selector while the *shape* is going to be an empty array. In the array-case, the passed array becomes the *shape* of the Selector. The action is going to be in both cases `() => []`.
+
+**Can**
+
+  * have either a condition or a shape, or both
+
+**Must**
+
+  * reduce the number of elements in the `Solution`
