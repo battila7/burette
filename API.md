@@ -12,7 +12,7 @@ Factory method that returns a `Solution` object encapsulating the passed element
 
 The optional `options` parameter is an object with the following keys supported:
 
-* `mergeReagents` `boolean` `optional` after a *subsolution* becomes *inert* (no reactions can be executed in the `Solution`) its content gets merged into its parent `Solution`. If this option is `false` then `Reagent`s in the subsolution will not be merged into the parent `Solution`. The default value is `true`.
+* `mergeReagents` `boolean` `optional` after a *subsolution* becomes *inert* (no reactions can be executed in the `Solution`) its content gets merged into its parent `Solution`. If this option is `false` then `Reagent`s in the subsolution will not be merged into the parent `Solution`. The default value is `false`.
 
 ### Solution.parallel(element1, [element2, [element3, [... elementN]]])
 
