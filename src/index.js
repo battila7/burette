@@ -29,7 +29,7 @@ const Reagent =  {
     const obj = Object.create(Reagent);
 
     obj.condition = options.condition,
-    obj.shape = options.shape;
+    obj.shape = options.shape.concat();
     obj.action = options.action;
 
     obj.args = Math.max(obj.condition.length, obj.action.length, obj.shape.length);
@@ -115,6 +115,12 @@ const Tropes = {
         condition: options,
         action: () => []
       }).nShot();
+    } else if (Array.isArray(options)) {
+      return Reagent.of({
+        shape: options,
+        condition: t,
+        action: () => []
+      });
     }
 
     return Reagent.of(options).nShot();
