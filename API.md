@@ -16,7 +16,38 @@ The optional `options` parameter is an object with the following keys supported:
 
 ### Solution.parallel(element1, [element2, [element3, [... elementN]]])
 
-Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. Subsolutions of a `Solution` can be executed in a parallel manner, hence the name of this method.
+Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. If an argument is an array then all of its elements will be added to the newly created `Solution`. Subsolutions of a `Solution` can be executed in a parallel manner, hence the name of this method.
+
+If a `Solution` is denoted by `< a, b, c, ... >` then 
+
+~~~~
+parallel(<a, b, c>, [d, e], f)
+~~~~
+
+yields
+
+~~~~
+< < a, b, c >, < d, e >, < f > >
+~~~~
+
+### Solution.seq(element1, [element2, [element3, [... elementN]]])
+
+Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. If an argument is an array then all of its elements will be added to the newly created `Solution`. The `Solution`s will be executed sequentially, from left to right in the order they appeared in the argument list.
+
+If a `Solution` is denoted by `< a, b, c, ... >` then 
+
+~~~~
+seq(< a, b, c >, [d, e], f)
+~~~~
+
+yields
+
+~~~~
+< < < a, b, c > d, e > f >
+~~~~
+
+Of course elements in the same `Solution` can still operate in a parallel fashion, but subsolutions must become *inert* before dissolving. This essentially results in sequential execution.
+
 
 ### react()
 
@@ -54,6 +85,95 @@ Factory method that returns a new `Reagent` with the configuration described by 
 When used as `Reagent.nShot(reagent)` then it returns an *n-shot* variant of the passed `Reagent`.
 
 Otherwise, when called on a `Reagent` instance then it produces an *n-shot* variant of the `Reagent` it was called on. 
+
+## Tropes
+
+*Tropes* stands for:
+
+  * **T**ransmuter
+  * **R**educer
+  * **OP**timizer
+  * **E**xpander
+  * **S**elector
+
+After examining the structure of various `Reagent`s, some typical patterns were recognized. The most useful 5 patterns are called the Tropes.
+
+For more information on Tropes please see: [A parallel programming style and its algebra of programs](http://www.cse.chalmers.se/~dave/papers/Sands-PARLE93.pdf)
+
+By using Tropes, other programmers can understand your program more easily and reasoning about the program's behaviour becomes simpler.
+
+By the nature of JavaScript, most of the restrictions of the various Tropes can not be expressed in a natural way. Therefore in some cases constructing a Tropes only has a semantic meaning.
+
+**Note** that all Tropes are *n-shot* by default.
+
+### Tropes.Transmuter(options)
+
+Applies the same operation to all elements of a `Solution` until no element satisfies the condition. The number of elements in the `Solution` does not change.
+
+The keys of the `options` parameter are the same as in the case of `Reagent.of(options)`. This method just increases the readibility.
+
+The `options` parameter can be a `function`. In that case the passed `function` is going to be the *action* of the Transmuter. The *shape* is going to be an empty array, while the condition is `() => true`.
+
+**Can**
+
+  * have a condition and/or a shape
+
+**Should**
+ 
+  * operate on one element
+  * return one element
+
+### Tropes.Reducer(options)
+
+Reduces the size of the `Solution` by applying an operation to pairs of elements and returning only one element.
+
+The keys of the `options` parameter are the same as in the case of `Reagent.of(options)`. This method just increases the readibility.
+
+The `options` parameter can be a `function`. In that case the passed `function` is going to be the *action* of the Reducer. The *shape* is going to be an empty array, while the condition is `() => true`.
+
+**Can**
+
+  * have a condition and/or a shape
+
+**Should**
+
+  * operate on two elements
+  * return one element
+
+### Tropes.Optimiser(options)
+
+Optimises the `Solution` according to a particular criterion while preserving the structure of the `Solution`.
+
+Valid keys of the `options` parameter:
+
+  * `ordering` `function` expresses the criterion. Called as
+
+  ~~~~JavaScript
+  ordering({ x: left(x, y), y: right(x, y) }, { x, y })
+  ~~~~
+
+  * `left` `function` calculates the first return value of the optimizer, takes two parameters
+  * `right` `function` calculates the second return value of the optimizer, takes two parameters
+  * `relation` `function` describes the structure, takes two parameters
+
+### Tropes.Expander(options)
+
+Decomposes the elements of the `Solution` into basic values using a `left` and a `right` function. Takes one element and produces two elements by using the functions.
+
+Valid keys of the `options` parameter:
+
+  * `condition`: should take one parameter
+  * `shape`: should have one parameter
+  * `left`: should produce one element
+  * `right` should produce one element
+
+### Tropes.Selector(options)
+
+Acts as a filter (annihilator), removing from the `Solution` elements satisfying the *condition*.
+
+The keys of the `options` parameter are the same as in the case of `Reagent.of(options)`. This method just increases the readibility.
+
+The `options` parameter can be a `function`. In that case the passed `function` is going to be the *condition* of the Selector. The *shape* is going to be an empty array, while the action is `() => []`.
 
 ## Burette.shapeValidator property
 

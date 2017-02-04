@@ -28,7 +28,7 @@ We create an *n-shot* version of `max` by calling the `nShot()` method on it and
 const sieve = Reagent.of({
   condition: (x, y) => x % y == 0,
   action: (x, y) => y
-});
+}).nShot();
 ~~~~
 
 Here we utilized the *condition*. If a number divides another number then only the divisor is kept. That way after the `Solution` becomes *inert*, there are no numbers in it that are divisors of each other. In other words we will only have primes in the `Solution`.
@@ -44,7 +44,7 @@ const dec = Reagent.of({
 }).nShot();
 ~~~~
 
-The divide phase is done in a *subsolution* named `createParts`. After this *subsolution* becomes inert, we combine the results in order to obtain the Fibonacci number. This is done by a simple `add` `Reagent`:
+The divide phase is done in a *subsolution*. After this *subsolution* becomes inert, we combine the results in order to obtain the Fibonacci number. This is done by a simple `add` `Reagent`:
 
 ~~~~JavaScript
 const add = Reagent.of({
@@ -52,7 +52,7 @@ const add = Reagent.of({
 }).nShot();
 ~~~~
 
-Note, that we used the `{ mergeReagents: false }` option in the main `Solution`. By using that option, the `dec` `Reagent` will be thrown away when merging the elements of the inert `createParts` `Solution` into the main `Solution`. This is a great example for `Solution` composition and introducing sequentiality.
+This is a great example for `Solution` composition and introducing sequentiality through `Solution.seq()`. You can pass `Solution`s, arrays or single elements as parameters to `Solution.seq()` as they will be wrapped into `Solution`s as needed. Then these `Solution`s are executed sequentially from left to right.
 
 ## [generate-primes](https://github.com/battila7/burette/blob/develop/examples/generate-primes.js)
 
@@ -95,3 +95,23 @@ const toNumber = Reagent.of({
 At this point, it can be clear why we needed shape matching. Numbers and interval objects coexist in the same `Solution` so we must prevent the case when a `Reagent` receives an element of an unexpected type or form.
 
 After the generation phase is done, we use the same sieve reaction as in the *sieve* program. 
+
+## [fib-tropes](https://github.com/battila7/burette/blob/develop/examples/fib-tropes.js)
+
+*fib-tropes* calculates the *nth* Fibonacci number. This program is semantically the same as *fib* but uses the well-known abstractions known as Tropes.
+
+~~~~JavaScript
+const dec = Tropes.Expander({
+  condition: x =>  x > 1,
+  left: x => x - 1,
+  right: x => x - 2
+});
+~~~~
+
+This `Reagent` simply divides a value into two simpler ones. Once only zeros and ones are in the *subsolution*, it dissolves and the following `Reagent` starts doing its work:
+
+~~~~JavaScript
+const add = Tropes.Reducer((x , y) => x + y);
+~~~~
+
+`add` as its name implies just adds two numbers together, reducing the `Solution`'s content into one value.

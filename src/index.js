@@ -70,10 +70,67 @@ const Reagent =  {
   }
 };
 
+const returnGenericTropes = function returnGenericTropes(options) {
+  if (typeof options == 'function') {
+    return Reagent.of({
+      action: options
+    }).nShot();
+  }
+
+  return Reagent.of(options).nShot();
+};
+
+const Tropes = {
+  Transmuter: returnGenericTropes,
+  Reducer: returnGenericTropes,
+  Optimiser(options) {
+    const action = function action(x, y) {
+      return [options.left(x, y), options.right(x, y)];
+    };
+
+    const condition = function condition(x, y) {
+      const left = options.left(x, y);
+      const right = options.right(x, y);
+
+      return options.ordering({ x: left, y: right }, { x, y }) && options.relation(x, y) && options.relation(left, right);
+    };
+
+    return Reagent.of({
+      condition,
+      shape: options.shape || [],
+      action
+    }).nShot();
+  },
+  Expander(options) {
+    const action = function action(x) {
+      return [options.left(x), options.right(x)];
+    };
+
+    return Reagent.of({
+      condition: options.condition,
+      shape: options.shape || [],
+      action
+    }).nShot();
+  },
+  Selector: returnGenericTropes
+};
+
+const argsIntoSolutions = function argsIntoSolutions(...args) {
+  return args.map(function toSolution(a) {
+    if (Object.prototype.isPrototypeOf.call(Solution, a)) {
+      return a;
+    } else if (Array.isArray(a)) {
+      return Solution.of(a);
+    }
+
+    return Solution.of([a]);
+  });
+};
+
 const Solution = {
   of(elements, options) {
     const defaults = {
-      mergeReagents: true
+      mergeReagents: false
     };
 
     const obj = Object.create(Solution);
@@ -84,18 +141,17 @@ const Solution = {
 
     return obj;
   },
+  seq(...args) {
+    const solutions = argsIntoSolutions(...args);
+
+    for (let i = 0; i < solutions.length - 1; i++) {
+      solutions[i + 1].multiset.push(solutions[i]);
+    }
+
+    return solutions[solutions.length - 1];
+  },
   parallel(...args) {
-    const solutions = args.map(function toSolution(a) {
-      if (Object.prototype.isPrototypeOf.call(Solution, a)) {
-        return a;
-      } else if (Array.isArray(a)) {
-        return Solution.of(a);
-      }
-
-      return Solution.of([a]);
-    });
-
-    return Solution.of(solutions);
+    return Solution.of(argsIntoSolutions(...args));
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
@@ -212,6 +268,7 @@ const Solution = {
 export default {
   Solution,
   Reagent,
+  Tropes,
   get shapeValidator() {
     return shapeValidatorFunc;
   },

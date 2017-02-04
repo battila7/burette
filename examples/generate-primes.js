@@ -33,8 +33,6 @@ const removeMultiplies = Reagent.of({
   action: (x, y) => y
 }).nShot();
 
-const generateNumbers = Solution.of([start, toNumber, split]);
-
-Solution.of([generateNumbers, removeMultiplies], { mergeReagents: false })
+Solution.seq([start, toNumber, split], removeMultiplies)
   .react()
   .then(s => console.log(s.multiset));

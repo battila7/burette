@@ -1,15 +1,14 @@
 const Burette = require('../lib/burette.js');
 const Solution = Burette.Solution;
-const Reagent = Burette.Reagent;
+const Tropes = Burette.Tropes;
 
-const dec = Reagent.of({
+const dec = Tropes.Expander({
   condition: x =>  x > 1,
-  action: x => [x - 1, x - 2]
-}).nShot();
+  left: x => x - 1,
+  right: x => x - 2
+});
 
-const add = Reagent.of({
-  action: (x, y) => x + y
-}).nShot();
+const add = Tropes.Reducer((x , y) => x + y);
 
 Solution.seq([10, dec], add)
   .react()
