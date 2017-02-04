@@ -151,16 +151,34 @@ const Solution = {
   parallel(...args) {
     return Solution.of(argsIntoSolutions(...args));
   },
-  shapeValidator(func) {
-    if (func) {
-      if (typeof func != 'function') {
-        throw new TypeError('The shape validator must be a function!');
-      }
+  setShapeValidator(func) {
+    if (typeof func != 'function') {
+      throw new TypeError('The shape validator must be a function!');
+    }
 
-      this.options.shapeValidator = func;
-    } 
+    this.options.shapeValidator = func;
 
+    return this;
+  },
+  getShapeValidator() {
     return this.options.shapeValidator;
+  },
+  applyValidatorToSubsolutions(overwrite) {
+    const validator = this.getShapeValidator();
+
+    (function recursivelySet(solution) {
+      solution.multiset.filter(function filterSolutions(element) {
+        return Object.prototype.isPrototypeOf.call(Solution, element);
+      }).forEach(function setter(subsolution) {
+        if (overwrite || subsolution.options.shapeValidator == t) {
+          subsolution.setShapeValidator(validator);
+        }
+
+        recursivelySet(subsolution);
+      });
+    })(this);
+
+    return this;
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
