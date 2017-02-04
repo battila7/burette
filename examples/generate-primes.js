@@ -3,15 +3,6 @@ const Solution = Burette.Solution;
 const Reagent = Burette.Reagent;
 const Joi = require('joi');
 
-Burette.shapeValidator = function validator(value, schema) {
-  return !Joi.validate(value, schema, { convert: false }).error;
-};
-
-const start = {
-  l: 2,
-  u: 25
-};
-
 const split = Reagent.of({
   shape: [Joi.object().keys({ l: Joi.number(), u: Joi.number() })],
   condition: i  => i.l != i.u,
@@ -28,11 +19,22 @@ const toNumber = Reagent.of({
   action: i => i.l
 }).nShot();
 
-const removeMultiplies = Reagent.of({
+const sieve = Reagent.of({
   condition: (x, y) => x % y == 0,
   action: (x, y) => y
 }).nShot();
 
-Solution.seq([start, toNumber, split], removeMultiplies)
-  .react()
-  .then(s => console.log(s.multiset));
+const start = {
+  l: 2,
+  u: 25
+};
+
+const validator = function validator(value, schema) {
+  return !Joi.validate(value, schema, { convert: false }).error;
+};
+
+Solution.seq([start, toNumber, split], sieve)
+        .setShapeValidator(validator)
+        .applyValidatorToSubsolutions()
+        .react()
+        .then(s => console.log(s.multiset));

@@ -1,16 +1,13 @@
 import Combinatorics from 'js-combinatorics';
 
-let shapeValidatorFunc = function validate() {
+const t = function t() {
   return true;
 };
 
 const Reagent =  {
-  t() {
-    return true;
-  },
   of(options) {
     const defaults = {
-      condition: Reagent.t,
+      condition: t,
       shape: [],
       acceptReagent: false
     }; 
@@ -112,7 +109,16 @@ const Tropes = {
       action
     }).nShot();
   },
-  Selector: returnGenericTropes
+  Selector(options) {
+    if (typeof options == 'function') {
+      return Reagent.of({
+        condition: options,
+        action: () => []
+      }).nShot();
+    }
+
+    return Reagent.of(options).nShot();
+  }
 };
 
 const argsIntoSolutions = function argsIntoSolutions(...args) {
@@ -130,7 +136,8 @@ const argsIntoSolutions = function argsIntoSolutions(...args) {
 const Solution = {
   of(elements, options) {
     const defaults = {
-      mergeReagents: false
+      mergeReagents: false,
+      shapeValidator: t
     };
 
     const obj = Object.create(Solution);
@@ -144,7 +151,7 @@ const Solution = {
   seq(...args) {
     const solutions = argsIntoSolutions(...args);
 
-    for (let i = 0; i < solutions.length - 1; i++) {
+    for (let i = 0, n = solutions.length - 1; i < n; i++) {
       solutions[i + 1].multiset.push(solutions[i]);
     }
 
@@ -152,6 +159,35 @@ const Solution = {
   },
   parallel(...args) {
     return Solution.of(argsIntoSolutions(...args));
+  },
+  setShapeValidator(func) {
+    if (typeof func != 'function') {
+      throw new TypeError('The shape validator must be a function!');
+    }
+
+    this.options.shapeValidator = func;
+
+    return this;
+  },
+  getShapeValidator() {
+    return this.options.shapeValidator;
+  },
+  applyValidatorToSubsolutions(overwrite) {
+    const validator = this.getShapeValidator();
+
+    (function recursivelySet(solution) {
+      solution.multiset.filter(function filterSolutions(element) {
+        return Object.prototype.isPrototypeOf.call(Solution, element);
+      }).forEach(function setter(subsolution) {
+        if (overwrite || subsolution.options.shapeValidator == t) {
+          subsolution.setShapeValidator(validator);
+        }
+
+        recursivelySet(subsolution);
+      });
+    })(this);
+
+    return this;
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
@@ -213,7 +249,7 @@ const Solution = {
 
         const args = this.findMatchingArguments(reagent);
 
-        if (!args) {
+        if (args == null) {
           this.multiset.push(reagent);
         } else {
           reactions.push({ reagent, args });
@@ -250,13 +286,14 @@ const Solution = {
     return null;
   },
   validateShape(reagent, args) {
-    const length = Math.min(reagent.shape.length, args.length);
-
-    for (let i = 0; i < length; i++) {
+    for (let i = 0, n = args.length; i < n; i++) {
       const noReagentMatch = !reagent.acceptReagent
                            && Object.prototype.isPrototypeOf.call(Reagent, args[i]);
 
-      if (noReagentMatch || !shapeValidatorFunc(args[i], reagent.shape[i])) {
+      const shapeMismatch = i < reagent.shape.length
+                          && !this.options.shapeValidator(args[i], reagent.shape[i]);
+
+      if (noReagentMatch || shapeMismatch) {
         return false;
       }
     }
@@ -268,15 +305,5 @@ const Solution = {
 export default {
   Solution,
   Reagent,
-  Tropes,
-  get shapeValidator() {
-    return shapeValidatorFunc;
-  },
-  set shapeValidator(func) {
-    if (typeof func != 'function') {
-      throw new TypeError('The argument is not a function!');
-    }
-
-    shapeValidatorFunc = func;
-  }
+  Tropes
 };
