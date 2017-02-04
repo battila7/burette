@@ -109,7 +109,16 @@ const Tropes = {
       action
     }).nShot();
   },
-  Selector: returnGenericTropes
+  Selector(options) {
+    if (typeof options == 'function') {
+      return Reagent.of({
+        condition: options,
+        action: () => []
+      }).nShot();
+    }
+
+    return Reagent.of(options).nShot();
+  }
 };
 
 const argsIntoSolutions = function argsIntoSolutions(...args) {
