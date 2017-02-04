@@ -1,11 +1,47 @@
 # Burette
+
 Chemical programming framework based on Banâtre's Gamma
 
 Please see [API.md](https://github.com/battila7/burette/blob/develop/API.md) for the documentation of Burette.
 
 Explanation of the examples can be found in [examples.md](https://github.com/battila7/burette/blob/develop/examples.md).
 
-## What does chemical programming mean?
+## Features
+
+  * **Composable**: Solutions can be combined in an arbitrary way, producing parallel and serial execution flow. 
+  * **Parallel execution**: Reagents can operate on the elements of a solution in a parallel manner.
+  * **Non-deterministic execution**: The arguments of a Reagent are selected in an arbitrary order.
+  * **Functional-first**: Program execution equals to a number of multiset transformations realized by pure Reagents.
+
+Only three (or two and a half) core concepts to understand:
+
+  * **Solution**: A multiset of elements (molecules) that provides an environment for reactions.
+  * **Reagent**: Takes some elements out of the enclosing solution and produces new ones (or nothing).
+  * **Tropes**: A collection of the most used Reagent patterns.
+
+## Example
+
+This simple example calculates the majority element:
+
+~~~~JavaScript
+const Burette = require('burette');
+const Solution = Burette.Solution;
+const Tropes = Burette.Tropes;
+
+const majority = Tropes.Selector((x, y) => x !== y);
+
+const keepOne = Tropes.Reducer((x, y) => y);
+
+Solution.seq([1, 2, 3, 4, 5, 5, majority], keepOne, [])
+  .react()
+  .then(s => console.log(s.multiset));
+
+// Output: [ 5 ]
+~~~~
+
+## Theory
+
+### What does chemical programming mean?
 
 Chemical programming (CP) is not about chemistry-related computations. Instead CP takes advantage of the chemical reaction model to establish a new programming paradigm and express computations. 
 
@@ -17,7 +53,7 @@ For more information on Gamma please read the following article:
 
 [Gamma and the Chemical Reaction Model: Fifteen Years After](http://pop-art.inrialpes.fr/~fradet/PDFs/Gamma15.pdf)
 
-## How does Burette correspond to Gamma?
+### How does Burette correspond to Gamma?
 
 The aim of Burette is to provide a framework that can be used in production and to enable developers to experience the CP paradigm. Therefore some aspects of Gamma may be altered or even left out if needed. But the core principle remains the same.
 
