@@ -151,7 +151,7 @@ const Solution = {
   seq(...args) {
     const solutions = argsIntoSolutions(...args);
 
-    for (let i = 0; i < solutions.length - 1; i++) {
+    for (let i = 0, n = solutions.length - 1; i < n; i++) {
       solutions[i + 1].multiset.push(solutions[i]);
     }
 
@@ -249,7 +249,7 @@ const Solution = {
 
         const args = this.findMatchingArguments(reagent);
 
-        if (!args) {
+        if (args == null) {
           this.multiset.push(reagent);
         } else {
           reactions.push({ reagent, args });
@@ -286,13 +286,14 @@ const Solution = {
     return null;
   },
   validateShape(reagent, args) {
-    const length = Math.min(reagent.shape.length, args.length);
-
-    for (let i = 0; i < length; i++) {
+    for (let i = 0, n = args.length; i < n; i++) {
       const noReagentMatch = !reagent.acceptReagent
                            && Object.prototype.isPrototypeOf.call(Reagent, args[i]);
 
-      if (noReagentMatch || !this.options.shapeValidator(args[i], reagent.shape[i])) {
+      const shapeMismatch = i < reagent.shape.length
+                          && !this.options.shapeValidator(args[i], reagent.shape[i]);
+
+      if (noReagentMatch || shapeMismatch) {
         return false;
       }
     }
