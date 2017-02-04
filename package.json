@@ -1,6 +1,6 @@
 {
   "name": "burette",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Chemical programming framework based on Banatre's gamma-calculus.",
   "keywords": [
     "chemical",
