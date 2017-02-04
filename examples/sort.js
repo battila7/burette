@@ -13,10 +13,7 @@ const assignIndex = Tropes.Transmuter({
   action: (n, i) => [{ index: i.index, n }, { index: i.index + 1 }]
 });
 
-const removeIndex = Reagent.of({
-  shape: [Joi.object().keys({ index: Joi.number() })],
-  action: () => []
-});
+const removeIndex = Tropes.Selector([Joi.object().keys({ index: Joi.number() })]);
 
 const sorter = Tropes.Optimiser({
   left: (a, b) => ({ index: a.index, n: b.n }),
