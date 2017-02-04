@@ -2,26 +2,29 @@
   "name": "burette",
   "version": "1.0.0",
   "description": "Chemical programming framework based on Banatre's gamma-calculus.",
+  "keywords": [
+    "chemical",
+    "framework"
+  ],
+  "homepage": "https://github.com/battila7/burette#readme",
+  "bugs": {
+    "url": "https://github.com/battila7/burette/issues"
+  },
+  "license": "Apache-2.0",
+  "author": "Attila Bagossy",
   "main": "lib/burette.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/battila7/burette.git"
+  },
   "scripts": {
     "lib": "./node_modules/.bin/rollup -c",
     "prepublish": "npm run lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/battila7/burette.git"
+  "dependencies": {
+    "js-combinatorics": "battila7/js-combinatorics"
   },
-  "keywords": [
-    "chemical",
-    "framework"
-  ],
-  "author": "Attila Bagossy",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/battila7/burette/issues"
-  },
-  "homepage": "https://github.com/battila7/burette#readme",
   "devDependencies": {
     "babel-preset-es2015-rollup": "^3.0.0",
     "rollup": "^0.41.4",
@@ -30,8 +33,5 @@
     "rollup-plugin-eslint": "^3.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-uglify": "^1.0.1"
-  },
-  "dependencies": {
-    "js-combinatorics": "battila7/js-combinatorics"
   }
 }
