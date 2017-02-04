@@ -32,7 +32,7 @@ const Reagent =  {
     obj.shape = options.shape;
     obj.action = options.action;
 
-    obj.args = Math.max(obj.condition.length, obj.action.length);
+    obj.args = Math.max(obj.condition.length, obj.action.length, obj.shape.length);
 
     return obj; 
   },
@@ -89,7 +89,7 @@ const Tropes = {
       const left = options.left(x, y);
       const right = options.right(x, y);
 
-      return options.ordering({ x: left, y: right }, { x, y }) && options.relation(x, y) && options.relation(left, right);
+      return options.ordering(left, right, x, y) && options.relation(x, y) && options.relation(left, right);
     };
 
     return Reagent.of({
