@@ -1,6 +1,6 @@
 {
   "name": "burette",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Chemical programming framework based on Banatre's gamma-calculus.",
   "main": "lib/burette.js",
   "scripts": {
