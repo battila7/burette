@@ -16,7 +16,38 @@ The optional `options` parameter is an object with the following keys supported:
 
 ### Solution.parallel(element1, [element2, [element3, [... elementN]]])
 
-Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. Subsolutions of a `Solution` can be executed in a parallel manner, hence the name of this method.
+Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. If an argument is an array then all of its elements will be added to the newly created `Solution`. Subsolutions of a `Solution` can be executed in a parallel manner, hence the name of this method.
+
+If a `Solution` is denoted by `< a, b, c, ... >` then 
+
+~~~~
+parallel(<a, b, c>, [d, e], f)
+~~~~
+
+yields
+
+~~~~
+< < a, b, c >, < d, e >, < f > >
+~~~~
+
+### Solution.seq(element1, [element2, [element3, [... elementN]]])
+
+Factory method that returns a `Solution` object encapsulating the passed elements as `Solution`s. The elements can be of any type. If an element is not a `Solution` object, then it will be wrapped into a `Solution`. If an argument is an array then all of its elements will be added to the newly created `Solution`. The `Solution`s will be executed sequentially, from left to right in the order they appeared in the argument list.
+
+If a `Solution` is denoted by `< a, b, c, ... >` then 
+
+~~~~
+seq(< a, b, c >, [d, e], f)
+~~~~
+
+yields
+
+~~~~
+< < < a, b, c > d, e > f >
+~~~~
+
+Of course elements in the same `Solution` can still operate in a parallel fashion, but subsolutions must become *inert* before dissolving. This essentially results in sequential execution.
+
 
 ### react()
 
@@ -72,6 +103,8 @@ For more information on Tropes please see: [A parallel programming style and its
 By using Tropes, other programmers can understand your program more easily and reasoning about the program's behaviour becomes simpler.
 
 By the nature of JavaScript, most of the restrictions of the various Tropes can not be expressed in a natural way. Therefore in some cases constructing a Tropes only has a semantic meaning.
+
+**Note** that all Tropes are *n-shot* by default.
 
 ### Tropes.Transmuter(options)
 
