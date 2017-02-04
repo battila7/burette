@@ -19,7 +19,7 @@ const toNumber = Reagent.of({
   action: i => i.l
 }).nShot();
 
-const removeMultiplies = Reagent.of({
+const sieve = Reagent.of({
   condition: (x, y) => x % y == 0,
   action: (x, y) => y
 }).nShot();
@@ -33,7 +33,7 @@ const validator = function validator(value, schema) {
   return !Joi.validate(value, schema, { convert: false }).error;
 };
 
-Solution.seq([start, toNumber, split], removeMultiplies)
+Solution.seq([start, toNumber, split], sieve)
         .setShapeValidator(validator)
         .applyValidatorToSubsolutions()
         .react()

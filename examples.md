@@ -59,7 +59,7 @@ This is a great example for `Solution` composition and introducing sequentiality
 This is a much more complex program compared to the others. *generate-primes* utilizes shape matching or shape validation using the *Joi* library. If you read the API, you know that a shape validator function must be supplied to Burette. Here we use the following: 
 
 ~~~~JavaScript
-Burette.shapeValidator = function validator(value, schema) {
+const validator = function validator(value, schema) {
   return !Joi.validate(value, schema, { convert: false }).error;
 };
 ~~~~
@@ -94,7 +94,9 @@ const toNumber = Reagent.of({
 
 At this point, it can be clear why we needed shape matching. Numbers and interval objects coexist in the same `Solution` so we must prevent the case when a `Reagent` receives an element of an unexpected type or form.
 
-After the generation phase is done, we use the same sieve reaction as in the *sieve* program. 
+After the generation phase is done, we use the same sieve reaction as in the *sieve* program.
+
+`Solution.seq()` is used to create the program, but we cannot call `react()` on it directly. First we have to set its shape validator to `validator()`. However that's not enough. Subsolutions will still use the default validator. To solve this issue we just need to call `applyValidatorToSubsolutions()` in order to set `validator()` as the shape validator function of the subsolutions. 
 
 ## [fib-tropes](https://github.com/battila7/burette/blob/develop/examples/fib-tropes.js)
 
