@@ -1,16 +1,13 @@
 import Combinatorics from 'js-combinatorics';
 
-let shapeValidatorFunc = function validate() {
+const t = function t() {
   return true;
 };
 
 const Reagent =  {
-  t() {
-    return true;
-  },
   of(options) {
     const defaults = {
-      condition: Reagent.t,
+      condition: t,
       shape: [],
       acceptReagent: false
     }; 
@@ -130,7 +127,8 @@ const argsIntoSolutions = function argsIntoSolutions(...args) {
 const Solution = {
   of(elements, options) {
     const defaults = {
-      mergeReagents: false
+      mergeReagents: false,
+      shapeValidator: t
     };
 
     const obj = Object.create(Solution);
@@ -152,6 +150,17 @@ const Solution = {
   },
   parallel(...args) {
     return Solution.of(argsIntoSolutions(...args));
+  },
+  shapeValidator(func) {
+    if (func) {
+      if (typeof func != 'function') {
+        throw new TypeError('The shape validator must be a function!');
+      }
+
+      this.options.shapeValidator = func;
+    } 
+
+    return this.options.shapeValidator;
   },
   react() {    
     const solutionPromises = this.removeAndGetSolutions()
@@ -256,7 +265,7 @@ const Solution = {
       const noReagentMatch = !reagent.acceptReagent
                            && Object.prototype.isPrototypeOf.call(Reagent, args[i]);
 
-      if (noReagentMatch || !shapeValidatorFunc(args[i], reagent.shape[i])) {
+      if (noReagentMatch || !this.options.shapeValidator(args[i], reagent.shape[i])) {
         return false;
       }
     }
@@ -268,15 +277,5 @@ const Solution = {
 export default {
   Solution,
   Reagent,
-  Tropes,
-  get shapeValidator() {
-    return shapeValidatorFunc;
-  },
-  set shapeValidator(func) {
-    if (typeof func != 'function') {
-      throw new TypeError('The argument is not a function!');
-    }
-
-    shapeValidatorFunc = func;
-  }
+  Tropes
 };
