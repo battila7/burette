@@ -308,8 +308,24 @@ const Solution = {
   }
 };
 
+const forever = function forever(solution, ...inputs) {
+  const addToSolution = function addToSolution(...elements) {
+    solution.multiset.push(...elements);
+  };
+
+  for (const input in inputs) {
+    input.propagator = addToSolution;
+  }
+
+  // spotify:track:0pIVR6niUwxRKP4yERLLj6
+  (function againAndAgain() {
+    setTimeout(() => solution.react().then(againAndAgain), 1);
+  })();
+};
+
 export default {
   Solution,
   Reagent,
-  Tropes
+  Tropes,
+  forever
 };
