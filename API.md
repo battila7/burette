@@ -54,6 +54,20 @@ Of course elements in the same `Solution` can still operate in a parallel fashio
 
 Instance method that initiates the chemical computation and returns a `Promise`. The returned `Promise` will be resolved with the *inert* `Solution`. If a computation never terminates then obviously the returned `Promise` will not be resolved. 
 
+### forever(): unit
+
+By calling this method on a `Solution`, it can be scheduled for continuous reaction. That means that even though the `Solution` bbecomes *inert*, it will be forced to react again and again. 
+
+This method is particularly useful when writing applications that depend on I/O since this makes it possible to *wait* for the input.
+
+### input(input1: Function, [input2: Function, [input3: Function, [... inputN: Function]]]): Solution
+
+Adds the specified inputs to the `Solution`. Inputs can put new elements into the `Solution` by using a propagator function.
+
+An input is simply a `function` with one parameter: the propagator function which accepts any number of arguments. The function representing the input will only be called once and may or may not return a value.
+
+Returns the instance it was called on to support method chaining.
+
 ### setShapeValidator(func: Function): Solution
 
 Can be used to set the shape validation function used by the `Solution` this method was called on. Returns the instance it was called on to support method chaining.
@@ -119,7 +133,17 @@ When used as `Reagent.nShot(reagent)` then it returns an *n-shot* variant of the
 
 Otherwise, when called on a `Reagent` instance then it produces an *n-shot* variant of the `Reagent` it was called on. 
 
-## Tropes
+## Burette.Catalyst
+
+`Reagent`s should be **pure** and only perform computations on their arguments. But that means that they can't perform side-effects. We can collect input using the *input*s, but how to do output or other `Reagent`-initiated side-effect? That's what `Catalyst`s can be used for!
+
+A `Catalyst` simply wraps a computation which may cause a side-effect, and delegates its execution outside of the `Reagent`. That way `Reagent`s can remain pure. So if you want to perform a side-effect, just return a `Catalyst`.
+
+### Catalyst.of(action: Function | Object): Catalyst
+
+Factory function that returns a new `Catalyst` wrapping the specified *action*. The action can be a `function` or an object with an `execute` method. 
+
+## Burette.Tropes
 
 *Tropes* stands for:
 
