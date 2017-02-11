@@ -50,6 +50,8 @@ const Reagent =  {
 
       if (Array.isArray(result)) {
         return [...result, nShotReagent];
+      } else if (result === undefined) {
+        return nShotReagent;
       }
 
       return [result, nShotReagent];
@@ -229,6 +231,24 @@ const Solution = {
 
     return Promise.all(promises).then(() => this);
   },
+  input(...inputs) {
+    const propagator = function propagator(...elements) {
+      this.multiset.push(...elements);
+    }.bind(this);
+
+    this.inputs = inputs.map(input => input(propagator))
+                        .filter(i => i !== undefined);
+
+    return this;
+  },
+  forever() {
+    const solution = this;
+
+    // spotify:track:0pIVR6niUwxRKP4yERLLj6
+    (function againAndAgain() {
+      setTimeout(() => solution.react().then(againAndAgain), 1);
+    })();
+  },
   mergeSolution(solution) {
     if (!this.options.mergeReagents) {
       const arr =
@@ -328,25 +348,9 @@ const Solution = {
   }
 };
 
-const forever = function forever(solution, ...inputs) {
-  const addToSolution = function addToSolution(...elements) {
-    solution.multiset.push(...elements);
-  };
-
-  for (const input in inputs) {
-    input.propagator = addToSolution;
-  }
-
-  // spotify:track:0pIVR6niUwxRKP4yERLLj6
-  (function againAndAgain() {
-    setTimeout(() => solution.react().then(againAndAgain), 1);
-  })();
-};
-
 export default {
   Solution,
   Reagent,
   Catalyst,
   Tropes,
-  forever
 };
