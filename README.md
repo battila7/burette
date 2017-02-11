@@ -13,11 +13,12 @@ Explanation of the examples can be found in [examples.md](https://github.com/bat
   * **Non-deterministic execution**: The arguments of a Reagent are selected in an arbitrary order.
   * **Functional-first**: Program execution equals to a number of multiset transformations realized by pure Reagents.
 
-Only three (or two and a half) core concepts to understand:
+Only four (or three and a half) core concepts to understand:
 
   * **Solution**: A multiset of elements (molecules) that provides an environment for reactions.
   * **Reagent**: Takes some elements out of the enclosing solution and produces new ones (or nothing).
   * **Tropes**: A collection of the most used Reagent patterns.
+  * **Catalyst**: A simple way to perform side-effects while preserving the purity of  *Reagents*.
 
 ## Example
 
