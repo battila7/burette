@@ -77,6 +77,23 @@ const returnGenericTropes = function returnGenericTropes(options) {
   return Reagent.of(options).nShot();
 };
 
+const Catalyst = {
+  of(action) {
+    const obj = Object.create(Catalyst);
+
+    obj.action = action;
+
+    return obj;
+  },
+  execute() {
+    if (typeof this.action == 'function') {
+      this.action();
+    } else if (this.action.execute) {
+      this.action.execute();
+    }
+  }
+};
+
 const Tropes = {
   Transmuter: returnGenericTropes,
   Reducer: returnGenericTropes,
@@ -195,8 +212,11 @@ const Solution = {
 
     return this;
   },
-  react() {    
-    const solutionPromises = this.removeAndGetSolutions()
+  react() {
+    this.extractWithPrototype(Catalyst)
+      .forEach(c => c.execute());
+
+    const solutionPromises = this.extractWithPrototype(Solution)
       .map(s => s.react()
                  .then(solution => this.mergeSolution(solution)));
 
@@ -231,18 +251,18 @@ const Solution = {
       resolve(reaction.reagent.action(...reaction.args));
     });
   },
-  removeAndGetSolutions() {
+  extractWithPrototype(proto) {
     let i = this.multiset.length;
 
-    const solutions = [];
+    const objs = [];
 
     while (i--) {
-      if (Object.prototype.isPrototypeOf.call(Solution, this.multiset[i])) {
-        solutions.push(this.multiset.splice(i, 1)[0]);
+      if (Object.prototype.isPrototypeOf.call(proto, this.multiset[i])) {
+        objs.push(this.multiset.splice(i, 1)[0]);
       }
     }
 
-    return solutions;
+    return objs;
   },
   removeAndGetReactions() {
     let i = this.multiset.length;
@@ -326,6 +346,7 @@ const forever = function forever(solution, ...inputs) {
 export default {
   Solution,
   Reagent,
+  Catalyst,
   Tropes,
   forever
 };
