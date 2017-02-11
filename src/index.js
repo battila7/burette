@@ -50,6 +50,8 @@ const Reagent =  {
 
       if (Array.isArray(result)) {
         return [...result, nShotReagent];
+      } else if (result === undefined) {
+        return nShotReagent;
       }
 
       return [result, nShotReagent];
@@ -75,6 +77,23 @@ const returnGenericTropes = function returnGenericTropes(options) {
   }
 
   return Reagent.of(options).nShot();
+};
+
+const Catalyst = {
+  of(action) {
+    const obj = Object.create(Catalyst);
+
+    obj.action = action;
+
+    return obj;
+  },
+  execute() {
+    if (typeof this.action == 'function') {
+      this.action();
+    } else if (this.action.execute) {
+      this.action.execute();
+    }
+  }
 };
 
 const Tropes = {
@@ -195,8 +214,11 @@ const Solution = {
 
     return this;
   },
-  react() {    
-    const solutionPromises = this.removeAndGetSolutions()
+  react() {
+    this.extractWithPrototype(Catalyst)
+      .forEach(c => c.execute());
+
+    const solutionPromises = this.extractWithPrototype(Solution)
       .map(s => s.react()
                  .then(solution => this.mergeSolution(solution)));
 
@@ -208,6 +230,24 @@ const Solution = {
       .map(p => p.then(() => this.react()));
 
     return Promise.all(promises).then(() => this);
+  },
+  input(...inputs) {
+    const propagator = function propagator(...elements) {
+      this.multiset.push(...elements);
+    }.bind(this);
+
+    this.inputs = inputs.map(input => input(propagator))
+                        .filter(i => i !== undefined);
+
+    return this;
+  },
+  forever() {
+    const solution = this;
+
+    // spotify:track:0pIVR6niUwxRKP4yERLLj6
+    (function againAndAgain() {
+      setTimeout(() => solution.react().then(againAndAgain), 1);
+    })();
   },
   mergeSolution(solution) {
     if (!this.options.mergeReagents) {
@@ -231,18 +271,18 @@ const Solution = {
       resolve(reaction.reagent.action(...reaction.args));
     });
   },
-  removeAndGetSolutions() {
+  extractWithPrototype(proto) {
     let i = this.multiset.length;
 
-    const solutions = [];
+    const objs = [];
 
     while (i--) {
-      if (Object.prototype.isPrototypeOf.call(Solution, this.multiset[i])) {
-        solutions.push(this.multiset.splice(i, 1)[0]);
+      if (Object.prototype.isPrototypeOf.call(proto, this.multiset[i])) {
+        objs.push(this.multiset.splice(i, 1)[0]);
       }
     }
 
-    return solutions;
+    return objs;
   },
   removeAndGetReactions() {
     let i = this.multiset.length;
@@ -311,5 +351,6 @@ const Solution = {
 export default {
   Solution,
   Reagent,
-  Tropes
+  Catalyst,
+  Tropes,
 };
